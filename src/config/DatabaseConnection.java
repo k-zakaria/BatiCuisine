@@ -18,14 +18,12 @@ public class DatabaseConnection {
             e.printStackTrace();
         }
     }
-
     public static DatabaseConnection getInstance() {
         if (instance == null) {
             instance = new DatabaseConnection();
         }
         return instance;
     }
-
     public Connection getConnection() {
         return connection;
     }
