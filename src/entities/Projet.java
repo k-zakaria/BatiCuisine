@@ -1,5 +1,8 @@
 package entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Projet {
 
     private int id;
@@ -8,6 +11,7 @@ public class Projet {
     private Double coutTotal;
     private EtatProjet etat;
     private Double surfaceCouisine;
+    private List<Composant> composants;
 
     public Projet(int id, String nom, Double margeBeneficiaire, Double coutTotal, EtatProjet etat, Double surfaceCouisine) {
         this.id = id;
@@ -16,6 +20,7 @@ public class Projet {
         this.coutTotal = coutTotal;
         this.etat = etat;
         this.surfaceCouisine = surfaceCouisine;
+        this.composants = new ArrayList<>();
     }
 
     public int getId() {
