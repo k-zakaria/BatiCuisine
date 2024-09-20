@@ -12,9 +12,10 @@ public class Projet {
     private EtatProjet etat;
     private Double surfaceCouisine;
     private List<Composant> composants;
+    private Client client;
 
-    public Projet(int id, String nom, Double margeBeneficiaire, Double coutTotal, EtatProjet etat, Double surfaceCouisine) {
-        this.id = id;
+
+    public Projet(String nom, Double margeBeneficiaire, Double coutTotal, EtatProjet etat, Double surfaceCouisine ) {
         this.nom = nom;
         this.margeBeneficiaire = margeBeneficiaire;
         this.coutTotal = coutTotal;
@@ -69,6 +70,14 @@ public class Projet {
 
     public void setSurfaceCouisine(Double surfaceCouisine) {
         this.surfaceCouisine = surfaceCouisine;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
     }
 
     @Override
