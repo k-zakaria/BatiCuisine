@@ -10,15 +10,13 @@ public class Client {
     private String adress;
     private String telephone;
     private Boolean estProfessionnel;
-    private List<Projet> projets ;
 
-    public Client(int id, String nom, String adress, String telephone, Boolean estProfessionnel){
-        this.id = id;
+
+    public Client( String nom, String adress, String telephone, Boolean estProfessionnel){
         this.nom = nom;
         this.adress = adress;
         this.telephone = telephone;
         this.estProfessionnel = estProfessionnel;
-        this.projets = new ArrayList<>();
     }
 
     public int getId(){
