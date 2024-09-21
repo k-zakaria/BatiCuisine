@@ -98,7 +98,7 @@ public class ProjetMenu {
                 double marge = projet.getMargeBeneficiaire();
                 double coutAvecMarge = coutTotal + (coutTotal * marge / 100);
 
-                System.out.println("Le coût total du projet '" + projet.getNom() + "' avec marge est de : " + coutAvecMarge + " €");
+                System.out.println("Le coût total du projet '" + projet.getNom() + "' avec marge est de : " + coutAvecMarge + " DH");
             } else {
                 System.out.println("Projet non trouvé.");
             }
