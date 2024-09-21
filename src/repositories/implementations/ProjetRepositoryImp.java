@@ -3,6 +3,7 @@ package repositories.implementations;
 import entities.Client;
 import entities.EtatProjet;
 import entities.Projet;
+import org.postgresql.util.PGobject;
 import repositories.ProjetRepository;
 
 import java.sql.*;
@@ -71,17 +72,33 @@ public class ProjetRepositoryImp implements ProjetRepository {
             return Optional.of(projets);
         }
     }
+
     @Override
     public void add(Projet projet) throws SQLException {
-        String query = "INSERT INTO projet (nom, margeBeneficiaire, coutTotal, etat, surfaceCouisine) VALUES (?,?,?,?,?)";
+        String query = "INSERT INTO projet (nom, margeBeneficiaire, coutTotal, etat, surfaceCouisine, id_client) VALUES (?,?,?,?,?,?) RETURNING id";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, projet.getNom());
             preparedStatement.setDouble(2, projet.getMargeBeneficiaire());
             preparedStatement.setDouble(3, projet.getCoutTotal());
-            preparedStatement.setString(4, projet.getEtat().name());
+
+            // Utiliser PGobject pour le type enum
+            PGobject etatEnum = new PGobject();
+            etatEnum.setType("etatprojet"); // Assurez-vous que le type correspond à votre base de données
+            etatEnum.setValue(projet.getEtat().name());
+            preparedStatement.setObject(4, etatEnum);
+
             preparedStatement.setDouble(5, projet.getSurfaceCouisine());
 
-            preparedStatement.executeUpdate();
+            // Associer le client au projet
+            preparedStatement.setInt(6, projet.getClient().getId()); // Assurez-vous que le client a un ID valide
+
+            // Exécuter l'insertion et récupérer l'ID généré
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    projet.setId(resultSet.getInt("id"));
+                    System.out.println("Projet ajouté avec succès avec l'ID: " + projet.getId());
+                }
+            }
         }
     }
 

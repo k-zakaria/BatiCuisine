@@ -11,11 +11,9 @@ import java.util.Optional;
 public class ClientRepositoryImp implements ClientRepository {
 
     private Connection connection;
-    private ClientRepository clientRepositoryImp;
 
-    public ClientRepositoryImp(Connection connection, ClientRepository clientRepositoryImp) {
+    public ClientRepositoryImp(Connection connection) {
         this.connection = connection;
-        this.clientRepositoryImp = clientRepositoryImp;
     }
 
     public Client genarateObject(ResultSet resultSet) throws SQLException{
@@ -44,7 +42,7 @@ public class ClientRepositoryImp implements ClientRepository {
             try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     client.setId(generatedKeys.getInt(1));
-                    System.out.println("Client ajouté avec ID: " + client.getNom());
+                    System.out.println("Client ajouté avec nom: " + client.getNom());
                 }
             }
 
@@ -52,7 +50,7 @@ public class ClientRepositoryImp implements ClientRepository {
     }
     @Override
     public Optional<Client> findByNom(String nom) throws SQLException{
-        String query = "SELECT * FROM users WHERE nom = ?";
+        String query = "SELECT * FROM client WHERE nom = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)){
             preparedStatement.setString(1, nom);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -65,7 +63,7 @@ public class ClientRepositoryImp implements ClientRepository {
 
     @Override
     public Optional<List<Client>> findAllByNom(String nom) throws SQLException {
-        String query = "SELECT * FROM users WHERE nom = ?";
+        String query = "SELECT * FROM client WHERE nom = ?";
         List<Client> clients = new ArrayList<>();
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {

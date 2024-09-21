@@ -10,6 +10,10 @@ import java.util.Optional;
     public class ClientService {
         private ClientRepository clientRepository;
 
+        public ClientService(ClientRepository clientRepository) {
+            this.clientRepository = clientRepository;
+        }
+
         public void add(Client client) throws SQLException {
             validateClient(client);
             clientRepository.add(client);
