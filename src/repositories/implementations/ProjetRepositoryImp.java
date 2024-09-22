@@ -74,6 +74,21 @@ public class ProjetRepositoryImp implements ProjetRepository {
     }
 
     @Override
+    public Optional<Projet> findById(int id) throws SQLException {
+        String query = "SELECT * FROM projet WHERE id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, id);
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                if (rs.next()) {
+                    Projet projet = genarateObject(rs);
+                    return Optional.of(projet);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public void add(Projet projet) throws SQLException {
         String query = "INSERT INTO projet (nom, margeBeneficiaire, coutTotal, etat, surfaceCouisine, id_client) VALUES (?,?,?,?,?,?) RETURNING id";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
