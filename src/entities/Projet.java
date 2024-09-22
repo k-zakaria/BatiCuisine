@@ -1,5 +1,8 @@
 package entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Projet {
 
     private int id;
@@ -8,14 +11,17 @@ public class Projet {
     private Double coutTotal;
     private EtatProjet etat;
     private Double surfaceCouisine;
+    private List<Composant> composants;
+    private Client client;
 
-    public Projet(int id, String nom, Double margeBeneficiaire, Double coutTotal, EtatProjet etat, Double surfaceCouisine) {
-        this.id = id;
+
+    public Projet(String nom, Double margeBeneficiaire, Double coutTotal, EtatProjet etat, Double surfaceCouisine ) {
         this.nom = nom;
         this.margeBeneficiaire = margeBeneficiaire;
         this.coutTotal = coutTotal;
         this.etat = etat;
         this.surfaceCouisine = surfaceCouisine;
+        this.composants = new ArrayList<>();
     }
 
     public int getId() {
@@ -64,6 +70,14 @@ public class Projet {
 
     public void setSurfaceCouisine(Double surfaceCouisine) {
         this.surfaceCouisine = surfaceCouisine;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
     }
 
     @Override

@@ -1,5 +1,8 @@
 package entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Client {
 
     private int id;
@@ -8,8 +11,8 @@ public class Client {
     private String telephone;
     private Boolean estProfessionnel;
 
-    public Client(int id, String nom, String adress, String telephone, Boolean estProfessionnel){
-        this.id = id;
+
+    public Client( String nom, String adress, String telephone, Boolean estProfessionnel){
         this.nom = nom;
         this.adress = adress;
         this.telephone = telephone;

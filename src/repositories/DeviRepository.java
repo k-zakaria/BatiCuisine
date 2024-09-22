@@ -1,4 +1,4 @@
 package repositories;
 
-public class DeviRepository {
+public interface DeviRepository {
 }

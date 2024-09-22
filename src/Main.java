@@ -1,17 +1,34 @@
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
+import config.DatabaseConnection;
+import repositories.ClientRepository;
+import repositories.ProjetRepository;
+import repositories.implementations.ClientRepositoryImp;
+import repositories.implementations.ProjetRepositoryImp;
+import services.ClientService;
+import services.ProjetService;
+import utils.MainMenu;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+
 public class Main {
-    public static void main(String[] args) {
-        // Press Alt+Enter with your caret at the highlighted text to see how
-        // IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+    public static void main(String[] args){
+        try  {
+            Connection connection = DatabaseConnection.getInstance().getConnection();
 
-        // Press Shift+F10 or click the green arrow button in the gutter to run the code.
-        for (int i = 1; i <= 5; i++) {
+            // Initialize repositories
+            ClientRepository clientRepository = new ClientRepositoryImp(connection);
+            ProjetRepository projetRepository = new ProjetRepositoryImp(connection);
 
-            // Press Shift+F9 to start debugging your code. We have set one breakpoint
-            // for you, but you can always add more by pressing Ctrl+F8.
-            System.out.println("i = " + i);
+            // Initialize services
+            ClientService clientService = new ClientService(clientRepository);
+            ProjetService projetService = new ProjetService(projetRepository);
+
+            // Initialisation et affichage du menu principal
+            MainMenu mainMenu = new MainMenu(projetService, clientService);
+            mainMenu.displayMenu();
+
+        } catch (SQLException e) {
+            System.out.println("Erreur de connexion à la base de données : " + e.getMessage());
         }
     }
 }

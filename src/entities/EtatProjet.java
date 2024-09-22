@@ -5,4 +5,8 @@ public enum EtatProjet {
     TERMINE,
     ANNULE;
 
+    @Override
+    public String toString() {
+        return name().toLowerCase();
+    }
 }
