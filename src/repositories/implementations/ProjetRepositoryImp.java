@@ -34,44 +34,8 @@ public class ProjetRepositoryImp implements ProjetRepository {
         return projet;
 
     }
-    @Override
-    public Optional<Projet> findByNom(String nom) throws SQLException{
-        String query = "SELECT * FROM projet WHERE nom = ?";
-        try(PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setString(1, nom);
-            preparedStatement.executeUpdate();
 
-            try(ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()){
-                    return Optional.of(genarateObject(resultSet));
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public Optional<List<Projet>> findAllByNom(String nom) throws SQLException {
-        String query = "SELECT * FROM projet WHERE nom = ?";
-        List<Projet> projets = new ArrayList<>();
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, nom);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    Projet projet = genarateObject(resultSet);
-                    projets.add(projet);
-                }
-            }
-        }
-
-        if (projets.isEmpty()) {
-            return Optional.empty();
-        } else {
-            return Optional.of(projets);
-        }
-    }
+    
 
     @Override
     public Optional<Projet> findById(int id) throws SQLException {
