@@ -4,8 +4,6 @@ import entities.Materiau;
 import repositories.MateriauRepository;
 
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Optional;
 
 public class MateriauService {
     private MateriauRepository materiauRepository;
@@ -18,17 +16,14 @@ public class MateriauService {
         validateMateriau(materiau);
         materiauRepository.add(materiau);
     }
-
-    public Optional<Materiau> findByNom(String nom) throws SQLException {
-        validateNom(nom);
-        return materiauRepository.findByNom(nom);
+    public void updateMateriau(Materiau materiau) throws SQLException {
+        validateMateriau(materiau);
+        materiauRepository.update(materiau);
     }
 
-    public Optional<List<Materiau>> findAllByNom(String nom) throws SQLException {
-        validateNom(nom);
-        return materiauRepository.findAllByNom(nom);
+    public void deleteMateriau(int id) throws SQLException {
+        materiauRepository.delete(id);
     }
-
 
     private void validateMateriau(Materiau materiau) {
         if (materiau == null) {

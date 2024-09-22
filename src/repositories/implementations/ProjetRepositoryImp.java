@@ -1,6 +1,6 @@
 package repositories.implementations;
 
-import entities.Client;
+
 import entities.EtatProjet;
 import entities.Projet;
 import org.postgresql.util.PGobject;
@@ -34,44 +34,8 @@ public class ProjetRepositoryImp implements ProjetRepository {
         return projet;
 
     }
-    @Override
-    public Optional<Projet> findByNom(String nom) throws SQLException{
-        String query = "SELECT * FROM projet WHERE nom = ?";
-        try(PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setString(1, nom);
-            preparedStatement.executeUpdate();
 
-            try(ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()){
-                    return Optional.of(genarateObject(resultSet));
-                }
-            }
-        }
-        return null;
-    }
 
-    @Override
-    public Optional<List<Projet>> findAllByNom(String nom) throws SQLException {
-        String query = "SELECT * FROM projet WHERE nom = ?";
-        List<Projet> projets = new ArrayList<>();
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, nom);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    Projet projet = genarateObject(resultSet);
-                    projets.add(projet);
-                }
-            }
-        }
-
-        if (projets.isEmpty()) {
-            return Optional.empty();
-        } else {
-            return Optional.of(projets);
-        }
-    }
 
     @Override
     public Optional<Projet> findById(int id) throws SQLException {
@@ -87,6 +51,34 @@ public class ProjetRepositoryImp implements ProjetRepository {
         }
         return Optional.empty();
     }
+    @Override
+    public Optional<Projet> findByNom(String nom) throws SQLException {
+        String query = "SELECT * FROM projet WHERE nom = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, nom);
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                if (rs.next()) {
+                    Projet projet = genarateObject(rs);
+                    return Optional.of(projet);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+    @Override
+    public List<Projet> findAll() throws SQLException {
+        List<Projet> projets = new ArrayList<>();
+        String query = "SELECT * FROM projet";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet rs = preparedStatement.executeQuery()) {
+            while (rs.next()) {
+                projets.add(genarateObject(rs));
+            }
+        }
+        return projets;
+    }
+
+
 
     @Override
     public void add(Projet projet) throws SQLException {
@@ -96,18 +88,15 @@ public class ProjetRepositoryImp implements ProjetRepository {
             preparedStatement.setDouble(2, projet.getMargeBeneficiaire());
             preparedStatement.setDouble(3, projet.getCoutTotal());
 
-            // Utiliser PGobject pour le type enum
             PGobject etatEnum = new PGobject();
-            etatEnum.setType("etatprojet"); // Assurez-vous que le type correspond à votre base de données
+            etatEnum.setType("etatprojet");
             etatEnum.setValue(projet.getEtat().name());
             preparedStatement.setObject(4, etatEnum);
 
             preparedStatement.setDouble(5, projet.getSurfaceCouisine());
 
-            // Associer le client au projet
-            preparedStatement.setInt(6, projet.getClient().getId()); // Assurez-vous que le client a un ID valide
+            preparedStatement.setInt(6, projet.getClient().getId());
 
-            // Exécuter l'insertion et récupérer l'ID généré
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     projet.setId(resultSet.getInt("id"));

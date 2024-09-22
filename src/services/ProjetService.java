@@ -8,78 +8,59 @@ import java.util.List;
 import java.util.Optional;
 
 public class ProjetService {
-
     private ProjetRepository projetRepository;
 
     public ProjetService(ProjetRepository projetRepository) {
         this.projetRepository = projetRepository;
     }
 
-    // Ajouter un nouveau projet
-    public void add(Projet projet) throws SQLException {
-        if (validateProjet(projet)) {
-            projetRepository.add(projet);
-        } else {
-            throw new IllegalArgumentException("Le projet est invalide.");
-        }
+    public void addProjet(Projet projet) throws SQLException {
+        validateProjet(projet);
+        projetRepository.add(projet);
     }
 
-    // Rechercher un projet par nom (retourne un projet unique)
     public Optional<Projet> findByNom(String nom) throws SQLException {
-        if (nom != null && !nom.isEmpty()) {
-            return projetRepository.findByNom(nom);
-        } else {
-            throw new IllegalArgumentException("Le nom ne peut pas être vide.");
-        }
+        validateNom(nom);
+        return projetRepository.findByNom(nom);
     }
 
-    // Rechercher tous les projets ayant le même nom
-    public Optional<List<Projet>> findAllByNom(String nom) throws SQLException {
-        if (nom != null && !nom.isEmpty()) {
-            return projetRepository.findAllByNom(nom);
-        } else {
-            throw new IllegalArgumentException("Le nom ne peut pas être vide.");
-        }
+    public Optional<Projet> findById(int id) throws SQLException {
+        return projetRepository.findById(id);
     }
 
-    // Mise à jour d'un projet existant
-    public void update(Projet projet) throws SQLException {
-        if (validateProjet(projet)) {
-            projetRepository.update(projet);
-        } else {
-            throw new IllegalArgumentException("Le projet est invalide.");
-        }
+
+    public List<Projet> findAllProjets() throws SQLException {
+        return projetRepository.findAll();
     }
 
-    // Suppression d'un projet par son nom
-    public void delete(String nom) throws SQLException {
-        if (nom != null && !nom.isEmpty()) {
-            projetRepository.delete(nom);
-        } else {
-            throw new IllegalArgumentException("Le nom ne peut pas être vide.");
-        }
+    public void updateProjet(Projet projet) throws SQLException {
+        validateProjet(projet);
+        projetRepository.update(projet);
     }
 
-    // Valider les informations d'un projet avant de l'ajouter ou le mettre à jour
-    private boolean validateProjet(Projet projet) {
+    public void deleteProjet(String nom) throws SQLException {
+        validateNom(nom);
+        projetRepository.delete(nom);
+    }
+
+    private void validateProjet(Projet projet) {
         if (projet == null) {
-            return false;
+            throw new IllegalArgumentException("Projet cannot be null");
         }
-        if (projet.getNom() == null || projet.getNom().isEmpty()) {
-            return false;
-        }
-        if (projet.getMargeBeneficiaire() == null || projet.getMargeBeneficiaire() <= 0) {
-            return false;
-        }
-        if (projet.getCoutTotal() == null || projet.getCoutTotal() <= 0) {
-            return false;
-        }
-        if (projet.getEtat() == null) {
-            return false;
+        if (projet.getNom() == null || projet.getNom().trim().isEmpty()) {
+            throw new IllegalArgumentException("Projet name cannot be null or empty");
         }
         if (projet.getSurfaceCouisine() == null || projet.getSurfaceCouisine() <= 0) {
-            return false;
+            throw new IllegalArgumentException("Surface de la cuisine doit être positive");
         }
-        return true;
+        if (projet.getClient() == null) {
+            throw new IllegalArgumentException("Projet must be associated with a client");
+        }
+    }
+
+    private void validateNom(String nom) {
+        if (nom == null || nom.trim().isEmpty()) {
+            throw new IllegalArgumentException("Projet name cannot be null or empty");
+        }
     }
 }
