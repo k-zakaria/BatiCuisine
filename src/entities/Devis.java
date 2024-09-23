@@ -2,22 +2,25 @@ package entities;
 
 import java.time.LocalDate;
 
-public class Devi {
+public class Devis {
 
     private int id;
-    private Double mantantEstime;
-
+    private Projet projet;
+    private double montantEstime;
     private LocalDate dateEmission;
     private LocalDate dateValidite;
-    private Boolean isAccepte;
+    private boolean isAccepte;
 
-    public Devi(int id, Double mantantEstime, LocalDate dateEmission, LocalDate dateValidite, Boolean isAccepte) {
+    public Devis(int id, Projet projet, double montantEstime, LocalDate dateEmission, LocalDate dateValidite, boolean isAccepte) {
         this.id = id;
-        this.mantantEstime = mantantEstime;
+        this.projet = projet;
+        this.montantEstime = montantEstime;
         this.dateEmission = dateEmission;
         this.dateValidite = dateValidite;
         this.isAccepte = isAccepte;
     }
+
+    // Getters and Setters
 
     public int getId() {
         return id;
@@ -27,12 +30,20 @@ public class Devi {
         this.id = id;
     }
 
-    public Double getMantantEstime() {
-        return mantantEstime;
+    public Projet getProjet() {
+        return projet;
     }
 
-    public void setMantantEstime(Double mantantEstime) {
-        this.mantantEstime = mantantEstime;
+    public void setProjet(Projet projet) {
+        this.projet = projet;
+    }
+
+    public double getMontantEstime() {
+        return montantEstime;
+    }
+
+    public void setMontantEstime(double montantEstime) {
+        this.montantEstime = montantEstime;
     }
 
     public LocalDate getDateEmission() {
@@ -51,19 +62,20 @@ public class Devi {
         this.dateValidite = dateValidite;
     }
 
-    public Boolean getAccepte() {
+    public boolean isAccepte() {
         return isAccepte;
     }
 
-    public void setAccepte(Boolean accepte) {
+    public void setAccepte(boolean accepte) {
         isAccepte = accepte;
     }
 
     @Override
     public String toString() {
-        return "Devi{" +
+        return "Devis{" +
                 "id=" + id +
-                ", mantantEstime=" + mantantEstime +
+                ", projet=" + projet +
+                ", montantEstime=" + montantEstime +
                 ", dateEmission=" + dateEmission +
                 ", dateValidite=" + dateValidite +
                 ", isAccepte=" + isAccepte +

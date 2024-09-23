@@ -1,6 +1,7 @@
 package services;
 
 import entities.MainDeOeuvre;
+import entities.Projet;
 import repositories.MainDeOeuvreRepository;
 
 import java.sql.SQLException;
@@ -17,6 +18,11 @@ public class MainDeOeuvreService {
     public void addMainDeOeuvre(MainDeOeuvre mainDeOeuvre) throws SQLException {
         validateMainDeOeuvre(mainDeOeuvre);
         mainDeOeuvreRepository.add(mainDeOeuvre);
+    }
+
+    public Optional<List<MainDeOeuvre>> findAllByProjectId(Projet projet) throws SQLException {
+
+        return mainDeOeuvreRepository.findAllByProjectId(projet);
     }
 
     public void updateMainDeOeuvre(MainDeOeuvre mainDeOeuvre) throws SQLException {
@@ -46,6 +52,11 @@ public class MainDeOeuvreService {
         }
         if (mainDeOeuvre.getProjet() == null) {
             throw new IllegalArgumentException("MainDeOeuvre doit être associée à un projet");
+        }
+    }
+    private void validateNom(String nom) {
+        if (nom == null || nom.trim().isEmpty()) {
+            throw new IllegalArgumentException("MainDeOeuvre name cannot be null or empty");
         }
     }
 }

@@ -6,6 +6,8 @@ import repositories.MainDeOeuvreRepository;
 import repositories.ProjetRepository;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class MainDeOeuvreRepositoryImp implements MainDeOeuvreRepository {
@@ -19,7 +21,7 @@ public class MainDeOeuvreRepositoryImp implements MainDeOeuvreRepository {
 
     @Override
     public void add(MainDeOeuvre mainDeOeuvre) throws SQLException {
-        String query = "INSERT INTO main_de_oeuvre (nom, type_composant, taux_TVA, taux_horaire, heures_travail, productivite_ouvrier, projet_id) " +
+        String query = "INSERT INTO maindoeuvre (nom, typecomposant, taux_tva, tauxhoraire, heurestravail, productiviteouvrier, id_projet) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, mainDeOeuvre.getNom());
@@ -36,6 +38,23 @@ public class MainDeOeuvreRepositoryImp implements MainDeOeuvreRepository {
                     System.out.println("Main-d'œuvre ajoutée avec succès avec l'ID : " + mainDeOeuvre.getId());
                 }
             }
+        }
+    }
+    public Optional<List<MainDeOeuvre>> findAllByProjectId(Projet projet) throws SQLException {
+        String sql = "SELECT * FROM maindoeuvre WHERE id_projet = ?";
+        List<MainDeOeuvre> mainDoeuvres = new ArrayList<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, projet.getId());
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                MainDeOeuvre mainDeOeuvre = mapResultSetToMainDeOeuvre(resultSet);
+                mainDoeuvres.add(mainDeOeuvre);
+            }
+
+            return mainDoeuvres.isEmpty() ? Optional.empty() : Optional.of(mainDoeuvres);
         }
     }
 
@@ -78,12 +97,12 @@ public class MainDeOeuvreRepositoryImp implements MainDeOeuvreRepository {
     private MainDeOeuvre mapResultSetToMainDeOeuvre(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         String nom = rs.getString("nom");
-        String typeComposant = rs.getString("type_composant");
-        double taux_TVA = rs.getDouble("taux_TVA");
-        double tauxHoraire = rs.getDouble("taux_horaire");
-        double heuresTravail = rs.getDouble("heures_travail");
-        double productiviteOuvrier = rs.getDouble("productivite_ouvrier");
-        int projetId = rs.getInt("projet_id");
+        String typeComposant = rs.getString("typecomposant");
+        double taux_TVA = rs.getDouble("taux_tva");
+        double tauxHoraire = rs.getDouble("tauxhoraire");
+        double heuresTravail = rs.getDouble("heurestravail");
+        double productiviteOuvrier = rs.getDouble("productiviteouvrier");
+        int projetId = rs.getInt("id_projet");
 
         Optional<Projet> projetOpt = projetRepository.findById(projetId);
         if (projetOpt.isEmpty()) {
