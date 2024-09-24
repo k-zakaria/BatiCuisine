@@ -5,12 +5,14 @@ public class MainDeOeuvre extends Composant {
     private Double tauxHoraire;
     private Double heuresTravail;
     private Double productiviteOuvrier;
+    private Projet projet;
 
-    public MainDeOeuvre(int id, String nom, String typeComposant, Double taux_TVA, Double tauxHoraire, Double heuresTravail, Double productiviteOuvrier) {
+    public MainDeOeuvre(int id, String nom, String typeComposant, Double taux_TVA, Double tauxHoraire, Double heuresTravail, Double productiviteOuvrier, Projet projet) {
         super(id, nom, typeComposant, taux_TVA);
         this.tauxHoraire = tauxHoraire;
         this.heuresTravail = heuresTravail;
         this.productiviteOuvrier = productiviteOuvrier;
+        this.projet = projet;
     }
 
     public Double getTauxHoraire() {
@@ -37,12 +39,20 @@ public class MainDeOeuvre extends Composant {
         this.productiviteOuvrier = productiviteOuvrier;
     }
 
+    public Projet getProjet() {
+        return projet;
+    }
+
+    public void setProjet(Projet projet) {
+        this.projet = projet;
+    }
     @Override
     public String toString() {
         return "MainDeOeuvre{" +
                 "tauxHoraire=" + tauxHoraire +
                 ", heuresTravail=" + heuresTravail +
                 ", productiviteOuvrier=" + productiviteOuvrier +
+                ", projet=" + projet +
                 ", id=" + id +
                 ", nom='" + nom + '\'' +
                 ", typeComposant='" + typeComposant + '\'' +

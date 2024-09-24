@@ -18,11 +18,9 @@ public class MateriauRepositoryImp implements MateriauRepository {
         this.connection = connection;
         this.projetRepository = projetRepository;
     }
-
     @Override
     public void add(Materiau materiau) throws SQLException {
-        String query = "INSERT INTO materiau (nom, type_composant, taux_TVA, cout_unitaire, quantite, cout_transport, coefficient_qualite, projet_id) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
+        String query = "INSERT INTO materiau (nom, typecomposant, taux_TVA, coutunitaire, quantite, couttransport, coefficientqualite, id_projet) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, materiau.getNom());
             preparedStatement.setString(2, materiau.getTypeComposant());
@@ -39,6 +37,24 @@ public class MateriauRepositoryImp implements MateriauRepository {
                     System.out.println("Matériau ajouté avec succès avec l'ID : " + materiau.getId());
                 }
             }
+        }
+    }
+    @Override
+    public Optional<List<Materiau>> findAllByProjetId(Projet projet) throws SQLException {
+        String sql = "SELECT * FROM materiau WHERE id_projet = ?";
+        List<Materiau> materiaux = new ArrayList<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, projet.getId());
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Materiau materiau = mapResultSetToMateriau(resultSet);
+                materiaux.add(materiau);
+            }
+
+            return materiaux.isEmpty() ? Optional.empty() : Optional.of(materiaux);
         }
     }
 
@@ -83,13 +99,13 @@ public class MateriauRepositoryImp implements MateriauRepository {
     private Materiau mapResultSetToMateriau(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         String nom = rs.getString("nom");
-        String typeComposant = rs.getString("type_composant");
-        double taux_TVA = rs.getDouble("taux_TVA");
-        double coutUnitaire = rs.getDouble("cout_unitaire");
+        String typeComposant = rs.getString("typecomposant");
+        double taux_TVA = rs.getDouble("taux_tva");
+        double coutUnitaire = rs.getDouble("coutunitaire");
         double quantite = rs.getDouble("quantite");
-        double coutTransport = rs.getDouble("cout_transport");
-        double coefficientQualite = rs.getDouble("coefficient_qualite");
-        int projetId = rs.getInt("projet_id");
+        double coutTransport = rs.getDouble("couttransport");
+        double coefficientQualite = rs.getDouble("coefficientqualite");
+        int projetId = rs.getInt("id_projet");
         Optional<Projet> projetOpt = projetRepository.findById(projetId);
         if (projetOpt.isEmpty()) {
             throw new SQLException("Projet avec l'ID " + projetId + " non trouvé.");

@@ -33,10 +33,6 @@ public class ProjetService {
         return projetRepository.findAll();
     }
 
-    public void updateProjet(Projet projet) throws SQLException {
-        validateProjet(projet);
-        projetRepository.update(projet);
-    }
 
     public void deleteProjet(String nom) throws SQLException {
         validateNom(nom);
@@ -52,9 +48,6 @@ public class ProjetService {
         }
         if (projet.getSurfaceCouisine() == null || projet.getSurfaceCouisine() <= 0) {
             throw new IllegalArgumentException("Surface de la cuisine doit être positive");
-        }
-        if (projet.getClient() == null) {
-            throw new IllegalArgumentException("Projet must be associated with a client");
         }
     }
 

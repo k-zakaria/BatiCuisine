@@ -1,9 +1,12 @@
 package services;
 
 import entities.Materiau;
+import entities.Projet;
 import repositories.MateriauRepository;
 
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
 
 public class MateriauService {
     private MateriauRepository materiauRepository;
@@ -15,6 +18,11 @@ public class MateriauService {
     public void add(Materiau materiau) throws SQLException {
         validateMateriau(materiau);
         materiauRepository.add(materiau);
+    }
+
+    public Optional<List<Materiau>> findAllByProjetId(Projet projet) throws SQLException {
+
+        return materiauRepository.findAllByProjetId(projet);
     }
     public void updateMateriau(Materiau materiau) throws SQLException {
         validateMateriau(materiau);

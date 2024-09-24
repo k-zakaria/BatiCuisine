@@ -79,6 +79,23 @@ public class ClientRepositoryImp implements ClientRepository {
         return clients.isEmpty() ? Optional.empty() : Optional.of(clients);
     }
 
+    @Override
+    public Optional<Client> findClientById(int clientId) throws SQLException {
+        String query = "SELECT * FROM client WHERE id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, clientId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    Optional.of(genarateObject(resultSet));
+                } else {
+                    throw new SQLException("Client non trouvé avec l'ID : " + clientId);
+                }
+            }
+        }
+        return null;
+    }
+
+
 
     @Override
     public void update(Client client) throws SQLException{
