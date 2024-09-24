@@ -1,16 +1,21 @@
 package services;
 
 import entities.Devis;
+import entities.EtatProjet;
 import repositories.DevisRepository;
+import repositories.ProjetRepository;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Optional;
 
 public class DevisService {
     private DevisRepository devisRepository;
+    private ProjetRepository projetRepository;
 
-    public DevisService(DevisRepository devisRepository) {
+    public DevisService(DevisRepository devisRepository, ProjetRepository projetRepository) {
         this.devisRepository = devisRepository;
+        this.projetRepository = projetRepository;
     }
 
     public void addDevis(Devis devis) throws SQLException {
@@ -18,9 +23,22 @@ public class DevisService {
         devisRepository.add(devis);
     }
 
-    public Optional<Devis> findById(int id) throws SQLException {
-        return devisRepository.findById(id);
+    public Optional<Devis> findByProjectName(String projectName) throws SQLException {
+        return devisRepository.findByProjectName(projectName);
     }
+    public void updateDevis(Devis devis) throws SQLException {
+        validateDevis(devis);
+
+        if (devis.getDateValidite().isBefore(LocalDate.now())) {
+            System.out.println("Le temps de validité pour ce devis est déjà dépassé !");
+            projetRepository.updateProjectStatus(devis.getProjet(), EtatProjet.ANNULE);
+            return;
+        }
+        devisRepository.update(devis);
+        System.out.println("Devis mis à jour avec succès !");
+    }
+
+
 
     private void validateDevis(Devis devis) {
         if (devis == null) {

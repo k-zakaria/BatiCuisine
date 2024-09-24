@@ -37,7 +37,8 @@ public class MainMenu {
             System.out.println("1. Créer un nouveau projet");
             System.out.println("2. Afficher les projets existants");
             System.out.println("3. Calculer le coût d'un projet");
-            System.out.println("4. Quitter");
+            System.out.println("4. Mettre à jour un devis");
+            System.out.println("5. Quitter");
             System.out.print("Choisissez une option : ");
             String choice = scanner.nextLine();
 
@@ -52,6 +53,9 @@ public class MainMenu {
                     calculateProjectCost();
                     break;
                 case "4":
+                    updateDevisByProjectName();
+                    break;
+                case "5":
                     exit = true;
                     System.out.println("Au revoir !");
                     break;
@@ -298,39 +302,35 @@ public class MainMenu {
             Optional<List<MainDeOeuvre>> mainDeOeuvreOpt = mainDeOeuvreService.findAllByProjectId(projet);
             List<MainDeOeuvre> mainDeOeuvres = mainDeOeuvreOpt.orElse(Collections.emptyList());
 
-            // Calcul des coûts
-            double totalMateriauxAvantTVA = 0.0;
-            double totalMateriauxAvecTVA = 0.0;
-            double totalMainDeOeuvreAvantTVA = 0.0;
-            double totalMainDeOeuvreAvecTVA = 0.0;
-
             DecimalFormat df = new DecimalFormat("#,##0.00");
 
             System.out.println("\n--- Détail des Coûts ---");
 
             // Matériaux
             System.out.println("1. Matériaux :");
-            for (Materiau m : materiaux) {
+            double totalMateriauxAvantTVA = materiaux.stream().mapToDouble(m -> {
                 double coutTotal = m.getCoutUnitaire() * m.getQuantite() * m.getCoefficientQualite() + m.getCoutTransport();
                 System.out.println("- " + m.getNom() + " : " + df.format(coutTotal) + " € (quantité : " + m.getQuantite()
                         + " m², coût unitaire : " + m.getCoutUnitaire() + " €/m², qualité : " + m.getCoefficientQualite()
                         + ", transport : " + m.getCoutTransport() + " €)");
-                totalMateriauxAvantTVA += coutTotal;
-            }
+                return coutTotal;
+            }).sum();
+
             System.out.println("**Coût total des matériaux avant TVA : " + df.format(totalMateriauxAvantTVA) + " €**");
-            totalMateriauxAvecTVA = totalMateriauxAvantTVA * (1 + tvaPercentage / 100);
+            double totalMateriauxAvecTVA = totalMateriauxAvantTVA * (1 + tvaPercentage / 100);
             System.out.println("**Coût total des matériaux avec TVA (" + tvaPercentage + "%) : " + df.format(totalMateriauxAvecTVA) + " €**");
 
             // Main-d'œuvre
             System.out.println("2. Main-d'œuvre :");
-            for (MainDeOeuvre mdo : mainDeOeuvres) {
+            double totalMainDeOeuvreAvantTVA = mainDeOeuvres.stream().mapToDouble(mdo -> {
                 double coutTotal = mdo.getTauxHoraire() * mdo.getHeuresTravail() * mdo.getProductiviteOuvrier();
                 System.out.println("- " + mdo.getNom() + " : " + df.format(coutTotal) + " € (taux horaire : " + mdo.getTauxHoraire()
                         + " €/h, heures travaillées : " + mdo.getHeuresTravail() + " h, productivité : " + mdo.getProductiviteOuvrier() + ")");
-                totalMainDeOeuvreAvantTVA += coutTotal;
-            }
+                return coutTotal;
+            }).sum();
+
             System.out.println("**Coût total de la main-d'œuvre avant TVA : " + df.format(totalMainDeOeuvreAvantTVA) + " €**");
-            totalMainDeOeuvreAvecTVA = totalMainDeOeuvreAvantTVA * (1 + tvaPercentage / 100);
+            double totalMainDeOeuvreAvecTVA = totalMainDeOeuvreAvantTVA * (1 + tvaPercentage / 100);
             System.out.println("**Coût total de la main-d'œuvre avec TVA (" + tvaPercentage + "%) : " + df.format(totalMainDeOeuvreAvecTVA) + " €**");
 
             // Coût total avant marge
@@ -347,7 +347,6 @@ public class MainMenu {
 
             // Mise à jour du projet avec le coût total
             projet.setCoutTotal(coutTotalFinal);
-            projetService.updateProjet(projet);
 
         } catch (NumberFormatException e) {
             System.out.println("Erreur de format numérique : " + e.getMessage());
@@ -355,15 +354,16 @@ public class MainMenu {
             System.out.println("Erreur lors du calcul du coût : " + e.getMessage());
             e.printStackTrace();
         }
-        return coutTotalFinal;  // Retour du coût total final
+        return coutTotalFinal;
     }
+
 
 
     private void saveDevis(Projet projet) {
         System.out.println("\n--- Enregistrement du Devis ---");
         try {
             // Appel de la méthode calculateAndDisplayCost pour obtenir le montant estimé
-            double montantEstime = calculateAndDisplayCost(projet);
+            double montantEstime = projet.getCoutTotal();
             System.out.println("Montant estimé du devis (coût total final) : " + montantEstime + " €");
 
             System.out.print("Entrez la date d'émission du devis (format : jj/mm/aaaa) : ");
@@ -374,8 +374,15 @@ public class MainMenu {
             String dateValiditeStr = scanner.nextLine().trim();
             LocalDate dateValidite = LocalDate.parse(dateValiditeStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
+            // Le devis est par défaut non accepté
+            boolean isAccepte = false; // Default value
+
+            // Option to accept the Devis
             System.out.print("Le devis est-il accepté ? (y/n) : ");
-            boolean isAccepte = scanner.nextLine().trim().equalsIgnoreCase("y");
+            String acceptanceInput = scanner.nextLine().trim();
+            if (acceptanceInput.equalsIgnoreCase("y")) {
+                isAccepte = true; // Update if the user indicates acceptance
+            }
 
             System.out.print("Souhaitez-vous enregistrer le devis ? (y/n) : ");
             String response = scanner.nextLine().trim();
@@ -402,6 +409,52 @@ public class MainMenu {
     }
 
 
+    private void updateDevisByProjectName() {
+        System.out.println("\n--- Mise à jour du Devis ---");
+        System.out.print("Entrez le nom du projet associé au devis à mettre à jour : ");
+        String projetNom = scanner.nextLine().trim();
+
+        try {
+            // Assuming you have a method in the service to find all Devis by project name
+            Optional<Devis> devisOpt = devisService.findByProjectName(projetNom);
+
+            if (devisOpt.isPresent()) {
+                Devis devis = devisOpt.get();
+
+                // Prompt for updated details similar to the previous method
+                System.out.print("Entrez le nouveau montant estimé du devis : ");
+                double montantEstime = Double.parseDouble(scanner.nextLine().trim());
+
+                System.out.print("Entrez la nouvelle date d'émission du devis (format : jj/mm/aaaa) : ");
+                String dateEmissionStr = scanner.nextLine().trim();
+                LocalDate dateEmission = LocalDate.parse(dateEmissionStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+                System.out.print("Entrez la nouvelle date de validité du devis (format : jj/mm/aaaa) : ");
+                String dateValiditeStr = scanner.nextLine().trim();
+                LocalDate dateValidite = LocalDate.parse(dateValiditeStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+                System.out.print("Le devis est-il accepté ? (y/n) : ");
+                boolean isAccepte = scanner.nextLine().trim().equalsIgnoreCase("y");
+
+                // Update Devis object
+                devis.setMontantEstime(montantEstime);
+                devis.setDateEmission(dateEmission);
+                devis.setDateValidite(dateValidite);
+                devis.setAccepte(isAccepte);
+
+                // Call updateDevis service method
+                devisService.updateDevis(devis);
+                System.out.println("Devis mis à jour avec succès !");
+            } else {
+                System.out.println("Devis non trouvé pour le projet avec le nom : " + projetNom);
+            }
+        } catch (SQLException | DateTimeParseException e) {
+            System.out.println("Erreur lors de la mise à jour du devis : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
 
     private void displayExistingProjects() {
         try {
@@ -411,9 +464,9 @@ public class MainMenu {
                 System.out.println("Aucun projet trouvé.");
                 return;
             }
-            for (Projet projet : projets) {
-                System.out.println(projet);
-            }
+
+            projets.stream().forEach(System.out::println);
+
         } catch (SQLException e) {
             System.out.println("Erreur lors de la récupération des projets : " + e.getMessage());
             e.printStackTrace();

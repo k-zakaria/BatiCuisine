@@ -8,10 +8,11 @@ import java.util.Optional;
 
 public interface ClientRepository {
 
-    public Optional<Client> findByNom(String nom) throws SQLException;
-    public Optional<List<Client>> findAllByNom(String nom) throws SQLException;
-    public void add(Client client) throws SQLException;
-    public void update(Client client) throws SQLException;
-    public void delete(String nom) throws SQLException;
+    Optional<Client> findByNom(String nom) throws SQLException;
+    Optional<List<Client>> findAllByNom(String nom) throws SQLException;
+    Optional<Client> findClientById(int clientId) throws SQLException;
+    void add(Client client) throws SQLException;
+    void update(Client client) throws SQLException;
+    void delete(String nom) throws SQLException;
 
 }

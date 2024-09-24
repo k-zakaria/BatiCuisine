@@ -24,7 +24,7 @@ public class Main {
             ProjetService projetService = new ProjetService(projetRepository);
             MateriauService materiauService = new MateriauService(materiauRepository);
             MainDeOeuvreService mainDeOeuvreService = new MainDeOeuvreService(mainDeOeuvreRepository);
-            DevisService devisService = new DevisService(devisRepository);
+            DevisService devisService = new DevisService(devisRepository,projetRepository);
 
             // Initialisation et affichage du menu principal
             MainMenu mainMenu = new MainMenu(projetService, clientService, materiauService, mainDeOeuvreService, devisService);

@@ -107,9 +107,20 @@ public class ProjetRepositoryImp implements ProjetRepository {
     }
 
     @Override
-    public void update(Projet projet) throws SQLException{
+    public void updateProjectStatus(Projet projet, EtatProjet etat) throws SQLException {
+        String query = "UPDATE projet SET etat = ? WHERE id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, etat.name());
+            preparedStatement.setInt(2, projet.getId());
 
+            preparedStatement.executeUpdate();
+            System.out.println("Statut du projet mis à jour avec succès !");
+        } catch (SQLException e) {
+            System.out.println("Erreur lors de la mise à jour du statut du projet : " + e.getMessage());
+            throw e;
+        }
     }
+
     @Override
     public void delete(String nom) throws SQLException{
 

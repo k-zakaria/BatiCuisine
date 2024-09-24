@@ -39,10 +39,10 @@ public class DevisRepositoryImp implements DevisRepository {
 
 
     @Override
-    public Optional<Devis> findById(int id) throws SQLException {
-        String query = "SELECT * FROM devis WHERE id = ?";
+    public Optional<Devis> findByProjectName(String projectName) throws SQLException {
+        String query = "SELECT d.* FROM devis d JOIN projet p ON d.id_projet = p.id WHERE p.nom = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, id);
+            preparedStatement.setString(1, projectName);
             try (ResultSet rs = preparedStatement.executeQuery()) {
                 if (rs.next()) {
                     Devis devis = mapResultSetToDevis(rs);
@@ -50,11 +50,32 @@ public class DevisRepositoryImp implements DevisRepository {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Erreur lors de la recherche du devis : " + e.getMessage());
+            System.out.println("Erreur lors de la recherche du devis par nom de projet : " + e.getMessage());
             e.printStackTrace();
         }
         return Optional.empty();
     }
+
+
+    @Override
+    public void update(Devis devis) throws SQLException {
+        String query = "UPDATE devis SET montantestime = ?, dateemission = ?, datevalidite = ?, isaccepte = ?, id_projet = ? WHERE id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setDouble(1, devis.getMontantEstime());
+            preparedStatement.setDate(2, Date.valueOf(devis.getDateEmission()));
+            preparedStatement.setDate(3, Date.valueOf(devis.getDateValidite()));
+            preparedStatement.setBoolean(4, devis.isAccepte());
+            preparedStatement.setInt(5, devis.getProjet().getId());
+            preparedStatement.setInt(6, devis.getId()); // Assuming you have a getId() method in Devis
+
+            preparedStatement.executeUpdate();
+            System.out.println("Devis mis à jour avec succès !");
+        } catch (SQLException e) {
+            System.out.println("Erreur lors de la mise à jour du devis : " + e.getMessage());
+            throw e;
+        }
+    }
+
 
 
     private Devis mapResultSetToDevis(ResultSet rs) throws SQLException {

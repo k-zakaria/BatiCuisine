@@ -24,6 +24,10 @@ import java.util.Optional;
             return clientRepository.findByNom(nom);
         }
 
+        public Optional<Client> findClientById(int clientId) throws SQLException{
+            return clientRepository.findClientById(clientId);
+        }
+
         public Optional<List<Client>> findAllByNom(String nom) throws SQLException{
             validateNom(nom);
             return clientRepository.findAllByNom(nom);
